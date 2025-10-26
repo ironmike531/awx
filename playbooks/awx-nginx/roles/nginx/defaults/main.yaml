@@ -1,2 +1,4 @@
 ---
+nginx_template_src: ""
+hello_world_template_src: ""
 nginx_state: present

@@ -1,13 +1,53 @@
 ---
-- name: Установить nginx
+- name: Создать резервную копию текущей конфигурации nginx
+  copy:
+    src: /etc/nginx/nginx.conf
+    dest: "/tmp/nginx.conf.bak"
+    force: yes
+
+- name: Определить шаблоны в зависимости от семейства ОС
+  set_fact:
+    nginx_template_src: "{{ 'nginx/debian/nginx.conf.j2' if ansible_facts['os_family'] == 'Debian' else 'nginx/centos/nginx.conf.j2' }}"
+    hello_world_template_src: "{{ 'nginx/debian/hello_world.conf.j2' if ansible_facts['os_family'] == 'Debian' else 'nginx/centos/hello_world.conf.j2' }}"
+
+- name: Установка nginx
   apt:
     name: nginx
     state: "{{ nginx_state }}"
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
-- name: Обеспечить, что nginx запущен и включен
+- name: Установка nginx
+  yum:
+    name: nginx
+    state: "{{ nginx_state }}"
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Создать конфигурацию nginx
+  template:
+    src: "{{ nginx_template_src }}"
+    dest: "/etc/nginx/nginx.conf"
+    mode: 0644
+
+- name: Создать шаблон “Hello World”
+  template:
+    src: "{{ hello_world_template_src }}"
+    dest: "/etc/nginx/conf.d/hello_world.conf"
+    mode: 0644
+
+- name: Проверить конфигурацию nginx
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+  ignore_errors: yes
+
+- name: Восстановить конфиг при неудаче теста
+  copy:
+    src: "/tmp/nginx.conf.bak"
+    dest: /etc/nginx/nginx.conf
+  when: nginx_test.failed
+
+- name: Перезапустить nginx при успешной проверке
   service:
     name: nginx
-    state: started
-    enabled: yes
-  notify: перезапустить nginx
+    state: restarted
+  when: nginx_test.rc == 0
