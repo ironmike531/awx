@@ -9,7 +9,7 @@
 - name: Определить шаблоны в зависимости от семейства ОС
   set_fact:
     nginx_template_src: "{{ 'nginx/debian/nginx.conf.j2' if ansible_facts['os_family'] == 'Debian' else 'nginx/centos/nginx.conf.j2' }}"
-    hello_world_template_src: "{{ 'nginx/debian/hello_world.conf.j2' if ansible_facts['os_family'] == 'Debian' else 'nginx/centos/hello_world.conf.j2' }}"
+    hello_world_template_src: "{{ 'hello_world/debian/hello_world.conf.j2' if ansible_facts['os_family'] == 'Debian' else 'hello_world/centos/hello_world.conf.j2' }}"
 
 - name: Установка nginx
   apt:
