@@ -1,0 +1,18 @@
+---
+- name: Установка nginx на выбранных хостах
+  hosts: "{{ target_hosts }}"
+  become: yes
+  vars:
+    nginx_state: present  # можно передавать 'present' или 'absent'
+  tasks:
+    - name: Установить nginx
+      apt:
+        name: nginx
+        state: "{{ nginx_state }}"
+      when: ansible_os_family == "Debian"
+
+    - name: Обеспечить, что nginx запущен и включен
+      service:
+        name: nginx
+        state: started
+        enabled: yes
