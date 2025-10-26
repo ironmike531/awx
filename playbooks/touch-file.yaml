@@ -1,0 +1,9 @@
+---
+- name: Создать тестовый файл
+  hosts: all  # или конкретный хост или группа
+#  become: yes  #если нужны права root
+  tasks:
+    - name: Создать файл /tmp/testfile.txt
+      file:
+        path: /tmp/testfile.txt
+        state: touch  
