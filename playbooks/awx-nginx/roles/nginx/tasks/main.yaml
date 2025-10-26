@@ -3,6 +3,7 @@
   copy:
     src: /etc/nginx/nginx.conf
     dest: "/tmp/nginx.conf.bak"
+    remote_src: yes
     force: yes
 
 - name: Определить шаблоны в зависимости от семейства ОС
