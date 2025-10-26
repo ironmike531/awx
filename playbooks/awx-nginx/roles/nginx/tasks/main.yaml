@@ -1,0 +1,13 @@
+---
+- name: Установить nginx
+  apt:
+    name: nginx
+    state: "{{ nginx_state }}"
+  when: ansible_os_family == "Debian"
+
+- name: Обеспечить, что nginx запущен и включен
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  notify: перезапустить nginx
